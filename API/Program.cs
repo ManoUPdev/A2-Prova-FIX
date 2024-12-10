@@ -16,11 +16,11 @@ app.MapPost("/api/tarefas/cadastrar", ([FromBody] Tarefa tarefa,
     return Results.Created("", tarefa);
 });
 
-app.MapGet("/api/tarefas/buscar{id}", ([FromRoute] int id,
+app.MapPost("/api/tarefas/buscar/{id}", ([FromRoute] int id,
     [FromServices] AppDataContext ctx) =>
 {
    Tarefa? tarefa = ctx.Tarefas.Find(id);
-   if(tarefa is null)
+   if (tarefa is null)
    {
       return Results.NotFound();
    }
@@ -38,6 +38,20 @@ app.MapGet("/api/tarefas/listar", ([FromServices] AppDataContext ctx) =>
    }
    return Results.NotFound();
 });
+
+app.MapDelete("/api/tarefas/deletar/{id}", ([FromRoute] int id,
+    [FromServices] AppDataContext ctx) =>
+{
+   Tarefa? tarefa = ctx.Tarefas.Find(id);
+   if (tarefa is null)
+   {
+      return Results.NotFound();
+   }
+   ctx.Tarefas.Remove(tarefa);
+   ctx.SaveChanges();
+   return Results.Ok(tarefa);
+});
+
 
 
 app.Run();
