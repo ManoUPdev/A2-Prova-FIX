@@ -1,0 +1,135 @@
+Passo 1
+Criar a solução onde será desenvolvida a API:
+
+
+dotnet new sln --output Todo
+Obs.: Você pode escolher outro nome em vez de "Todo".
+
+Passo 2
+Criar uma pasta para a API e gerar o projeto:
+
+
+dotnet new web --name API
+
+Passo 3
+Adicionar o projeto da API à solução:
+
+
+dotnet sln add API
+
+Passo 4
+Rodar o projeto para obter a porta em localhost:
+
+
+dotnet run --project API
+A API rodará em http://localhost:XXXX, onde XXXX é a porta gerada.
+
+Passo 5
+Criar um arquivo .http para armazenar as requisições:
+
+Clique com o botão direito no Explorer → New File
+Crie um arquivo chamado test.http.
+Copie a porta gerada no passo anterior enquanto a API estiver rodando.
+Não interrompa a API antes dos testes. Você pode rodar a API tanto no terminal externo quanto no VSCode.
+
+Passo 6
+Enviar requisições com o REST Client:
+
+Com a extensão REST Client instalada, use Send Request no arquivo .http para testar os endpoints.
+Passo 7
+
+Criar a pasta Models e adicionar as classes necessárias:
+
+No Solution Explorer, clique com o botão direito na pasta API.
+Selecione Add → New Folder e nomeie como Models.
+Adicione as classes necessárias dentro dessa pasta.
+Passo 8
+
+Atualizar o arquivo API.csproj para incluir a pasta Models:
+Adicione o seguinte bloco no API.csproj:
+
+xml
+Copiar código
+<ItemGroup>
+    <Folder Include="Models\" />
+</ItemGroup>
+Passo 9
+
+Adicionar pacotes do Entity Framework Core:
+
+Navegue até a pasta da API:
+
+
+cd API
+Instale os pacotes necessários:
+
+
+dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add package Microsoft.EntityFrameworkCore.Design
+Passo 10
+
+Criar o arquivo AppDataContext.cs:
+
+Este arquivo configurará o banco de dados e definirá os DbSet para as classes.
+Passo 11
+
+Adicionar a primeira migração:
+
+Instale a ferramenta dotnet-ef (se necessário):
+
+
+dotnet tool install --global dotnet-ef
+Crie a migração inicial:
+
+
+dotnet ef migrations add InitialCreate
+Passo 12
+Aplicar a migração para criar o banco de dados:
+
+
+dotnet ef database update
+Dica: Se quiser mudar o nome do banco, será necessário recriá-lo.
+
+Passo 13
+
+Modificar Program.cs para permitir a rota POST de cadastro de tarefas:
+Adicione um endpoint para cadastrar tarefas:
+
+
+
+app.MapPost("/api/tarefas/cadastrar", async (AppDataContext db, Tarefa novaTarefa) =>
+{
+    db.Tarefas.Add(novaTarefa);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/tarefas/{novaTarefa.Id}", novaTarefa);
+});
+Passo 14
+Adicionar um endpoint GET para listar todas as tarefas:
+No Program.cs, adicione:
+
+
+app.MapGet("/api/tarefas", async (AppDataContext db) =>
+{
+    return await db.Tarefas.ToListAsync();
+});
+Atualize o arquivo test.http com a requisição GET:
+
+http
+
+GET http://localhost:XXXX/api/tarefas
+
+Passo 15
+Adicionar um endpoint GET para buscar uma tarefa específica:
+No Program.cs, adicione:
+
+
+app.MapGet("/api/tarefas/{id}", async (int id, AppDataContext db) =>
+{
+    var tarefa = await db.Tarefas.FindAsync(id);
+    return tarefa is not null ? Results.Ok(tarefa) : Results.NotFound();
+});
+Adicione a requisição correspondente em test.http:
+
+http
+
+GET http://localhost:XXXX/api/tarefas/1
