@@ -1,18 +1,27 @@
 ### Testar a raiz do projeto
 GET http://localhost:5078
 
-
 ### Listar todas as tarefas
 GET http://localhost:5078/api/tarefas/listar
-
 
 ### Buscar uma tarefa pelo id
 GET http://localhost:5078/api/tarefas/buscar/2
 
+### Deletar uma tarefa pelo id
+DELETE http://localhost:5078/api/tarefas/deletar/3
+
 ### Cadastrar tarefa
-POST  http://localhost:5078/api/tarefas/cadastrar
+POST http://localhost:5078/api/tarefas/cadastrar
 Content-Type: application/json
 
 {
-  "nome": "Tarefa 1 "
+    "nome": "Estudar para a prova de Dev Visual"
+}
+
+### Alterar tarefa
+PUT http://localhost:5078/api/tarefas/alterar/2
+Content-Type: application/json
+
+{
+    "nome": "Lembrar que a partir de semana que vem, tem aula presencial, com prova"
 }
